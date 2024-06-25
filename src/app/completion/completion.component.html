@@ -1,0 +1,9 @@
+@for (item of stationMatch; track $index) {
+    
+    <div class="searchBox"  (click)="select($index)">
+        <img [src]="iconMap.get(stationNames[$index])" alt="linePic" height="25px">
+        <div class='res'>{{item | slice:8}}</div>
+    </div>
+
+    
+}

@@ -1,0 +1,50 @@
+<div id="main">
+    <div id="searchDiv">
+        <form [formGroup]="formData">
+            <div id="container">
+                <div id="formDiv">
+                    <div id="localisationDiv">
+                        <div id="inputDiv">
+                            <input type="text" placeholder="De:" formControlName="start" class="stationSearch" (keydown)="clearList(1)">
+                            <input type="text" placeholder="À:" formControlName="destination"  class="inputTrajet stationSearch" (keydown)="clearList(2)">
+                        </div>
+                        <div id="switchDiv">
+                            <img src="../../assets/img/Capture.PNG" alt="switchIcon" (click)="reverse()">
+                        </div>
+                    </div>
+                    <div id="timeDiv">
+                        <select formControlName="day"  class="inputTrajet" id="day" (change)="validate()">
+                            @for (ele of semaine; track $index) {
+                                <option [value]="$index">{{ele}}</option>
+                            }
+                            
+                        </select>
+                
+                        <select formControlName="reverse" class="inputTrajet" id="reverse" (change)="validate()">
+                            <option value="0">Partir à</option>
+                            <option value="1">Arriver à</option>
+                        </select>
+
+                        <input type="time" formControlName="start_time"  class="inputTrajet timeChoice" id="time" (change)="validate()">
+                    </div>
+                </div>
+                <div id="trajetDiv">
+
+                    @if (trajetStations.length === 0) {
+
+                        <div id="proposition">
+                            <app-completion [start]="formData.value.start" [destination]="formData.value.destination" (stationChoice)="completer($event)"
+                                            (validation)="validate($event)"></app-completion>
+                        </div>
+                    }@else {
+
+                        <trajetComponet [trajet]="trajetStations" [carbon]="carbon" [totalTime]="totalTime" (stationChoice)="displayStation($event)"></trajetComponet>
+                    }
+                    
+                </div>
+            </div>
+        </form>
+    </div>
+    <div id="map"></div>
+    
+</div>

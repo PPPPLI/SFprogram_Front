@@ -1,0 +1,82 @@
+.timeline {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 20px;    
+}
+
+.station {
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding: 20px;
+    min-width: calc(100% - 40px);
+}
+
+.time {
+    text-align: right;
+    margin-right: 15px;
+    text-align: left;
+}
+
+.circle {
+    width: 12px;
+    height: 12px;
+    background-color: white;
+    border: 2px orange solid;
+    border-radius: 20px;
+    margin-right: 10px;
+    z-index: 5;
+}
+
+.station::before {
+    content: '';
+    position: absolute;
+    top: 25px;
+    left: 86px; 
+    width: 4px;
+    height: 100%;
+    background-color: orange;
+}
+
+.station:hover {
+
+    color: red;
+    cursor: pointer;
+}
+
+.station:last-child::before {
+    height: 10px;
+}
+
+.name {
+    white-space: nowrap;
+}
+
+img{
+
+    margin-left: 10px;
+}
+
+h5{
+
+    color: black;
+    font-weight: 600;
+    font-size: small;
+    text-align: center;
+    border: 2px solid rgb(237, 235, 235);
+    border-radius: 15px;
+    padding: 8px;
+    box-shadow: 0 3px 5px rgb(224, 224, 224);
+}
+
+#carbon{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin-bottom: 10px;
+    cursor: default;
+}

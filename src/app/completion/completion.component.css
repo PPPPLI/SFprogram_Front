@@ -1,0 +1,30 @@
+div{
+
+    cursor: pointer;
+    margin: 15px 0;
+    font-weight: 400;
+    font-size: medium;
+    padding-left: 10%;
+    
+}
+
+
+.searchBox{
+
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: center;
+    color: rgb(155, 151, 151);
+}
+
+.searchBox:hover{
+
+    background-color: rgb(249, 247, 247);
+    color: black;
+}
+
+.res{
+
+    text-align: left;
+}

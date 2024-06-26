@@ -13,6 +13,8 @@
     position: relative;
     padding: 20px;
     min-width: calc(100% - 40px);
+    color: rgb(93, 93, 93);
+
 }
 
 .time {
@@ -25,26 +27,26 @@
     width: 12px;
     height: 12px;
     background-color: white;
-    border: 2px orange solid;
     border-radius: 20px;
     margin-right: 10px;
     z-index: 5;
 }
 
-.station::before {
+
+.station::before{
     content: '';
     position: absolute;
     top: 25px;
     left: 86px; 
     width: 4px;
     height: 100%;
-    background-color: orange;
 }
 
 .station:hover {
 
-    color: red;
+    color: black;
     cursor: pointer;
+    
 }
 
 .station:last-child::before {
@@ -57,7 +59,7 @@
 
 img{
 
-    margin-left: 10px;
+    margin-left: 15px;
 }
 
 h5{
@@ -69,7 +71,7 @@ h5{
     border: 2px solid rgb(237, 235, 235);
     border-radius: 15px;
     padding: 8px;
-    box-shadow: 0 3px 5px rgb(224, 224, 224);
+    box-shadow: 0 1px 3px rgb(224, 224, 224);
 }
 
 #carbon{
@@ -79,4 +81,11 @@ h5{
     justify-content: center;
     margin-bottom: 10px;
     cursor: default;
+}
+
+.lineIcon{
+
+    padding: 0 10px;
+    border-left: 2px dotted rgb(212, 212, 212);
+    
 }

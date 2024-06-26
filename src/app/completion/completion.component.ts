@@ -74,8 +74,6 @@ export class CompletionComponent implements AfterViewInit,OnDestroy, OnChanges{
 
         if(changes["start"] || changes["destination"]){
 
-            console.log(this.current)
-
             if(this.destination !== "" && changes['destination'] != null && (changes['destination'].currentValue != this.current.destination)){
 
                 this.search(this.destination)

@@ -161,4 +161,9 @@ img{
     -2px 2px 0 #fff,
     2px 2px 0 #fff,
     0px 0px 5px #fff; 
-  }
+}
+
+.totalTime{
+
+    border: 1px solid black;
+}

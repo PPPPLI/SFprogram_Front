@@ -4,10 +4,20 @@
         <h5>Durée totale: <label [ngStyle]="{color:'red'}">{{totalTime}}</label> mins | Empreinte carbone : <label [ngStyle]="{color:'green'}">{{carbon}}</label> g</h5>
     </div>
     
-    <div *ngFor="let ele of trajet; index as i" class="station" (mouseover)="sendStationChoice(i)" (mouseout)="sendStationChoice(-1)">
+    <div *ngFor="let ele of trajet; index as i" [class]="ele.line" class="station" [ngClass]="prefix.concat(i.toString())" (mouseover)="sendStationChoice(i)" (mouseout)="sendStationChoice(-1)">
         <div class="time">{{ele.time | slice: 0:5}}</div>
         <div class="circle"></div>
         <div class="name">{{ele.name}}</div>
+        @if(transitionIndex.includes(i)){
+
+            <img [src]="iconMap.get(transitionLine[transitionIndex.indexOf(i)])" width="50px" class="lineIcon">
+        }
+
+        @if(transitionIndex.includes(i+1)){
+
+            <img src="../../assets/img/pieton.PNG" height="25px">
+        }
+
         @if (ele.accessible) {
             <img src="../../assets/img/pmr.PNG" width="25px">
         }

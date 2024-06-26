@@ -168,6 +168,8 @@ export class MainComponent implements OnInit,OnDestroy{
                 this.totalTime = this.timecaculator.calculator(this.trajetStations[0].time,this.trajetStations[this.trajetStations.length-1].time)
 
                 this.showtrajet(this.trajetStations,true)
+
+                this.circlesFeature.addLayer(this.markerputService.putTimeMarker(this.trajetStations,this.totalTime,this.initialZoomLevel!,this.map!))
             })
     }
 

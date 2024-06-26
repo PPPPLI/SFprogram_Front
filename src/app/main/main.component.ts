@@ -71,6 +71,9 @@ export class MainComponent implements OnInit,OnDestroy{
     segmentsFeature:L.FeatureGroup = L.featureGroup()
     markerFeature: L.FeatureGroup = L.featureGroup()
     subscrib:Subscription = new Subscription;
+    stylesheet = document.styleSheets[0] as CSSStyleSheet
+    styleIndex!:number
+
     data:Trajet = {
         
         start: "",
@@ -117,6 +120,7 @@ export class MainComponent implements OnInit,OnDestroy{
         
         let formInfo = this.formData.value;
         this.isFirstStation = true
+        this.stylesheet.deleteRule(this.styleIndex)
 
         if(formInfo.start != "" || formInfo.destination != ""){
             
@@ -167,9 +171,12 @@ export class MainComponent implements OnInit,OnDestroy{
 
                 this.totalTime = this.timecaculator.calculator(this.trajetStations[0].time,this.trajetStations[this.trajetStations.length-1].time)
 
-                this.showtrajet(this.trajetStations,true)
 
-                this.circlesFeature.addLayer(this.markerputService.putTimeMarker(this.trajetStations,this.totalTime,this.initialZoomLevel!,this.map!))
+                this.styleIndex = this.stylesheet.cssRules.length
+
+                this.showtrajet(this.trajetStations,true)
+                let tooltip = this.markerputService.putTimeMarker(this.trajetStations,this.totalTime)
+                this.circlesFeature.addLayer(tooltip)
             })
     }
 
@@ -313,6 +320,7 @@ export class MainComponent implements OnInit,OnDestroy{
             this.trajet = []
             this.lineMarker = "init"
             this.isFirstStation = true
+            this.stylesheet.deleteRule(this.styleIndex)
         }
 
     }

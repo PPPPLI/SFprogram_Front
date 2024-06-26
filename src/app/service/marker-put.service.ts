@@ -27,7 +27,7 @@ export class MarkerPutService{
         ["LINE_13","../../assets/img/line13.png"],
         ["LINE_14","../../assets/img/line14.png"]
     ])
-
+    styleSheet = document.styleSheets[0] as CSSStyleSheet
 
     markerPositionCalculate(currentStation:Station,stationList:Station[],content:string,type:boolean){
 
@@ -136,53 +136,57 @@ export class MarkerPutService{
         }
     }
 
-    putTimeMarker(stationList:Station[],totalTime:number,initialZoomLevel?:number,map?:L.Map){
+    putTimeMarker(stationList:Station[],totalTime:number){
 
-        let station:Station = stationList[Number.parseInt((stationList.length/2).toString())]
         let linesOfTrajet:string[] = []
         let content = ""
-        let zoomLevel = map!.getZoom()
-        let newRadius= 100 * Math.pow(2, initialZoomLevel! - zoomLevel!)
         let correspondance:Station
         let marker:boolean = false
-        let coordonnes:L.LatLngExpression
+        let station:Station
+        let maxLatitude = 0
 
+        
         stationList.forEach(ele=>{
 
             if(linesOfTrajet.indexOf(ele.line) === -1){
 
                 if(marker){
-
                     correspondance = ele
                 }
-
                 linesOfTrajet.push(ele.line)
                 marker = true
             }
         })
 
-        if(linesOfTrajet.length === 1){
+        stationList.forEach(ele=>{
 
-            coordonnes= [station.latitude,station.longitude]
+            if(maxLatitude < ele.latitude){
+                maxLatitude = ele.latitude
+                station = ele
+            }
+        })
 
-        }else{
-
-            coordonnes= [correspondance!.latitude, correspondance!.longitude]
-        }
 
         linesOfTrajet.forEach(ele=>{
             
-            content += `<img src="${this.iconMap.get(ele)}" alt="icon" height=18px>`
-            content += `<span> > </span>`
+            content += `<img src="${this.iconMap.get(ele)}" alt="icon" height=20px class="bannerIcon">`
+            content += `<span style="color:rgb(190, 190, 190)"> > </span>`
         })
 
-        content += `<span> | ${totalTime} minutes</span>`
+        content += `<span style="font-size:small">  ${totalTime} minutes</span>`
 
+        this.styleSheet.insertRule(
+            ".bannerIcon{top:5px !important; position:relative}",
+            this.styleSheet.cssRules.length
+        )
+        
         return  L.tooltip({
             content: `${content}`,
-            direction:"auto",
-            sticky:true
-        }).setLatLng(coordonnes)
+            direction:"top",
+            opacity:0.9,
+            permanent:true,
+            offset:[0,-30]
+        }).setLatLng([station!.latitude,station!.longitude])
     }
 
 }

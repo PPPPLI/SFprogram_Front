@@ -7,5 +7,17 @@
         "pathRewrite":{
             "^/find" : "/find"
         }
+    },
+
+    "/lines":{
+        "target":"http://localhost:8040",
+        "secure":false,
+        "logLevel":"debug",
+        "changeOrigin":true,
+        "pathRewrite":{
+            "^/lines" : "/lines"
+        }
     }
+
+
 }

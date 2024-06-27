@@ -1,4 +1,4 @@
-import { Component, OnChanges, OnDestroy, OnInit} from '@angular/core';
+import { Component, OnDestroy, OnInit} from '@angular/core';
 import * as L from 'leaflet';
 import { LinesService } from '../service/lines.service';
 import { Subscription } from 'rxjs';
@@ -31,36 +31,23 @@ export class MainComponent implements OnInit,OnDestroy{
     isFirstStation:boolean = true
     lastStation!:[number,number]
     preStation:Station = {
-
         name:"",
         accessible:false,
         latitude:0,
         longitude:0,
         line:"",
-        time:""
+        time:"",
+        culture:{
+            name:"",
+            latitude:0,
+            longitude:0
+        }
     }
     initialZoomLevel?:number
     totalTime = 0
     validationDepart = false
     validationArrival = false
-
-    colors:Map<string,string> = new Map([
-        ["LINE_1","#ffbe00"],
-        ["LINE_2","#0055c8"],
-        ["LINE_3","#6e6e00"],
-        ["LINE_3B","82c8e6"],
-        ["LINE_4","#a0006e"],
-        ["LINE_5","#ff5a00"],
-        ["LINE_6","#82dc73"],
-        ["LINE_7","#ff82b4"],
-        ["LINE_7B","#82dc73"],
-        ["LINE_8","#d282be"],
-        ["LINE_9","#d2d200"],
-        ["LINE_10","#dc9600"],
-        ["LINE_11","#6e491e"],
-        ["LINE_12","#00643c"],
-        ["LINE_13","#82c8e6"],
-        ["LINE_14","#640082"]])
+    colors!:Map<string,string>
     map?:L.Map
     stationNames?:Array<String>
     metroLines = [[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]]
@@ -70,12 +57,11 @@ export class MainComponent implements OnInit,OnDestroy{
     circlesFeature:L.FeatureGroup = L.featureGroup()
     segmentsFeature:L.FeatureGroup = L.featureGroup()
     markerFeature: L.FeatureGroup = L.featureGroup()
-    subscrib:Subscription = new Subscription;
+    subscrib:Subscription = new Subscription();
+    subscribColor:Subscription = new Subscription()
     stylesheet = document.styleSheets[0] as CSSStyleSheet
     styleIndex!:number
-
     data:Trajet = {
-        
         start: "",
         destination:"",
         time: "",
@@ -86,7 +72,6 @@ export class MainComponent implements OnInit,OnDestroy{
     localTime = new Date()
 
     formData = this.formBuilder.group({
-
         start : ["", Validators.required],
         destination : ["",Validators.required],
         start_time: [  `${this.localTime.getHours().toString().padStart(2,"0")}:${this.localTime.getMinutes().toString().padStart(2,"0")}`,Validators.required],
@@ -94,6 +79,7 @@ export class MainComponent implements OnInit,OnDestroy{
         reverse:[0,Validators.required]
     })
 
+    
     completer(data:any){
 
         if(data[1]){
@@ -134,6 +120,9 @@ export class MainComponent implements OnInit,OnDestroy{
                 start:formInfo.start,
                 destination:formInfo.destination
             })
+
+            this.lines.recouverCurrentChoice(formInfo.destination!,true)
+            this.lines.recouverCurrentChoice(formInfo.start!,false)
         }
 
         this.validate()
@@ -141,7 +130,7 @@ export class MainComponent implements OnInit,OnDestroy{
 
     print(){
 
-            this.trajetStations = []
+            let buffer:Station[] = []
 
             let formInfo = this.formData.value;
             this.data.start = formInfo.start!
@@ -163,18 +152,20 @@ export class MainComponent implements OnInit,OnDestroy{
 
                             ele.latitude = Number.parseFloat(station.substring(station.indexOf("latitude")+11,station.length-1))
                             ele.longitude = Number.parseFloat(station.substring(station.indexOf("longitude")+12,station.indexOf("latitude")-3))
-                            this.trajetStations.push(ele)
+                            buffer.push(ele)
                         }
                         
                     })
                 })
 
+                this.trajetStations = buffer
                 this.totalTime = this.timecaculator.calculator(this.trajetStations[0].time,this.trajetStations[this.trajetStations.length-1].time)
 
 
                 this.styleIndex = this.stylesheet.cssRules.length
 
                 this.showtrajet(this.trajetStations,true)
+                this.markerputService.putFlagToCulture(buffer,this.circlesFeature)
                 let tooltip = this.markerputService.putTimeMarker(this.trajetStations,this.totalTime)
                 this.circlesFeature.addLayer(tooltip)
             })
@@ -361,7 +352,7 @@ export class MainComponent implements OnInit,OnDestroy{
     }
 
     ngOnInit(): void {
-     
+
         this.map = L.map('map',{
             maxZoom:20,
             zoomDelta:0.5
@@ -398,11 +389,18 @@ export class MainComponent implements OnInit,OnDestroy{
         this.subscrib = this.lines.isRecover$.subscribe(data=>{
 
             this.globalData = data
+
+        })
+
+        this.subscribColor = this.lines.colorMap$.subscribe(data =>{
+
+            this.colors = data
         })
     }
 
     ngOnDestroy(): void {
         
         this.subscrib.unsubscribe()
+        this.subscribColor.unsubscribe()
     }
 }

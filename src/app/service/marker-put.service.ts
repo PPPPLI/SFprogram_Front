@@ -185,8 +185,32 @@ export class MarkerPutService{
             direction:"top",
             opacity:0.9,
             permanent:true,
-            offset:[0,-30]
+            offset:[0,-20]
         }).setLatLng([station!.latitude,station!.longitude])
+    }
+
+    putFlagToCulture(stationList:Station[], featureGroup:L.FeatureGroup){
+
+        let previousSite = ""
+
+        stationList.forEach(ele=>{
+
+            if(ele.culture != null && ele.culture.name != previousSite){
+
+                let icon = new L.Icon({
+                    iconUrl:"../../assets/img/guide.PNG",
+                    iconSize:[30,30],
+                })
+                let flag = new L.Marker([ele.culture.latitude,ele.culture.longitude],{
+
+                    icon:icon
+                })
+
+                flag.bindPopup(`<h5>${ele.culture.name}</h5>`).openPopup
+                featureGroup.addLayer(flag)
+                previousSite = ele.name
+            }
+        })
     }
 
 }

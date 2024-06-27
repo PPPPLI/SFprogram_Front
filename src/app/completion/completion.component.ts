@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, Renderer2, SimpleChanges } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnDestroy,  Output,SimpleChanges } from '@angular/core';
 import { LinesService } from '../service/lines.service';
 import { Subscription } from 'rxjs';
 import { SlicePipe } from '@angular/common';
@@ -21,32 +21,18 @@ export class CompletionComponent implements AfterViewInit,OnDestroy, OnChanges{
 
     subscriptor:Subscription = new Subscription()
     subscriptorCurrent:Subscription = new Subscription()
+    subscriptorIcon:Subscription = new Subscription()
     localData: any
     stationMatch:string[] = []
     stationNames:string[] = []
-    current:any
+    current:any = {
+        start:"",
+        destination:""
+    }
     cible:boolean = false
-    iconMap:Map<string,string> = new Map([
+    iconMap!:Map<string,string>
 
-        ["LINE_1","../../assets/img/line1.png"],
-        ["LINE_2","../../assets/img/line2.png"],
-        ["LINE_3","../../assets/img/line3.png"],
-        ["LINE_3B","../../assets/img/line3B.png"],
-        ["LINE_4","../../assets/img/line4.png"],
-        ["LINE_5","../../assets/img/line5.png"],
-        ["LINE_6","../../assets/img/line6.png"],
-        ["LINE_7","../../assets/img/line7.png"],
-        ["LINE_7B","../../assets/img/line7B.png"],
-        ["LINE_8","../../assets/img/line8.png"],
-        ["LINE_9","../../assets/img/line9.png"],
-        ["LINE_10","../../assets/img/line10.png"],
-        ["LINE_11","../../assets/img/line11.png"],
-        ["LINE_12","../../assets/img/line12.png"],
-        ["LINE_13","../../assets/img/line13.png"],
-        ["LINE_14","../../assets/img/line14.png"]
-    ])
-
-    constructor(private data: LinesService, private render: Renderer2, private selector: ElementRef){}
+    constructor(private data: LinesService){}
 
     select(index:number){
 
@@ -58,24 +44,29 @@ export class CompletionComponent implements AfterViewInit,OnDestroy, OnChanges{
 
     ngOnChanges(changes: SimpleChanges): void {
 
+        
         if(this.localData == null){
 
             this.subscriptor = this.data.isRecover$.subscribe(res=>{
 
                 this.localData = res;
-  
+    
             })
 
             this.subscriptorCurrent = this.data.currentChoice$.subscribe(res=>{
 
                 this.current = res
             })
+
+            this.subscriptorIcon = this.data.iconMap$.subscribe(res=>{
+                this.iconMap = res
+            })
         }
+
 
         if(changes["start"] || changes["destination"]){
 
             if(this.destination !== "" && changes['destination'] != null && (changes['destination'].currentValue != this.current.destination)){
-
                 this.search(this.destination)
                 this.cible = true
 
@@ -119,22 +110,33 @@ export class CompletionComponent implements AfterViewInit,OnDestroy, OnChanges{
 
     ngAfterViewInit(): void { 
 
-        this.subscriptor = this.data.isRecover$.subscribe(res=>{
+        if(this.localData ==null){
 
-            this.localData = res;
-            
-        })
+                this.subscriptor = this.data.isRecover$.subscribe(res=>{
 
-        this.subscriptorCurrent = this.data.currentChoice$.subscribe(res=>{
+                    this.localData = res;
+            })
+    
+        
+                this.subscriptorCurrent = this.data.currentChoice$.subscribe(res=>{
+        
+                    this.current = res
+            })
+    
+                this.subscriptorIcon = this.data.iconMap$.subscribe(res=>{
+        
+                    this.iconMap = res
+            })
+        }
 
-            this.current = res
-        })
+
     }
 
     ngOnDestroy(): void {
         
         this.subscriptor.unsubscribe()
         this.subscriptorCurrent.unsubscribe()
+        this.subscriptorIcon.unsubscribe()
     }
 
 }

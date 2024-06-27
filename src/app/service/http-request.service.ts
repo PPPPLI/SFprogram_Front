@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, tap } from 'rxjs';
-import { Res, Station, Trajet } from '../model/models';
+import { Res, Trajet } from '../model/models';
 
 @Injectable({
   providedIn: 'root'
@@ -30,5 +30,18 @@ export class HttpRequestService {
                     }
                 })
             )
+    }
+
+    getlines(url:string){
+
+        return this.httpclient.get(url,{responseType:"json"})
+        .pipe(
+            tap({
+                error(erro){
+
+                    console.log(erro)
+                }
+            })
+        )
     }
 }

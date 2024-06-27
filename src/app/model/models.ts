@@ -15,6 +15,8 @@ export type Res = {
     connexe:boolean
 }
 
+
+
 export type Station = {
 
     name: string,
@@ -22,5 +24,10 @@ export type Station = {
     time: string,
     accessible:boolean,
     longitude: number,
-    latitude: number
+    latitude: number,
+    culture:{
+        name:string,
+        latitude:number,
+        longitude:number
+    }
 }

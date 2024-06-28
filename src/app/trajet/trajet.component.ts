@@ -33,7 +33,7 @@ export class TrajetComponent implements OnInit,OnDestroy,AfterViewInit{
     styleSheet = document.styleSheets[0] as CSSStyleSheet
 
     sendStationChoice(station:number){
-
+        
         this.stationChoice.emit(station)
     }
 

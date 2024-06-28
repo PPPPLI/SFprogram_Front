@@ -428,24 +428,24 @@ export class MainComponent implements OnInit,OnDestroy{
             this.markerFeature.clearLayers()
     
             let station:Station = this.trajetStations[data]
-    
-            let icon = this.markerputService.markerPositionCalculate(station,this.trajetStations,station.name,false)
-    
-            this.markerFeature.addLayer(L.marker([station.latitude,station.longitude],{icon:icon}))
-            let zoomLevel = this.map?.getZoom()
-            let newRadius= 100 * Math.pow(2, this.initialZoomLevel! - zoomLevel!)
-    
-            this.markerFeature.addLayer(L.circle([station.latitude,station.longitude],{radius:newRadius,
-                fillColor:"white", 
-                fill:true,
-                weight:3,
-                color:"black",
-                fillOpacity:1
-            })).setZIndex(1)
 
+            if(station){
+
+                let icon = this.markerputService.markerPositionCalculate(station,this.trajetStations,station.name,false)
+    
+                this.markerFeature.addLayer(L.marker([station.latitude,station.longitude],{icon:icon}))
+                let zoomLevel = this.map?.getZoom()
+                let newRadius= 100 * Math.pow(2, this.initialZoomLevel! - zoomLevel!)
+        
+                this.markerFeature.addLayer(L.circle([station.latitude,station.longitude],{radius:newRadius,
+                    fillColor:"white", 
+                    fill:true,
+                    weight:3,
+                    color:"black",
+                    fillOpacity:1
+                })).setZIndex(1)
+            }
         }
-
-
     }
 
     ngOnInit(): void {

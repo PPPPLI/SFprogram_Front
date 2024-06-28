@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { Observable, catchError, of, tap } from 'rxjs';
 import { Res, Trajet } from '../model/models';
 
 @Injectable({
@@ -23,13 +23,18 @@ export class HttpRequestService {
         .set('reverse', param.reverse)
 
         return this.httpclient.get<Res>(url,{params:httpParam,responseType:"json"})
+
             .pipe(
-                tap({
-                    error(erro){
-                        console.log(erro)
+
+                tap(
+                    {
+                        error(err) {
+                            console.log(err)
+                        },
                     }
-                })
+                )
             )
+            
     }
 
     getlines(url:string){

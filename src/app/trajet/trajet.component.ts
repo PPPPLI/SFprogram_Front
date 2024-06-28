@@ -39,6 +39,7 @@ export class TrajetComponent implements OnInit,OnDestroy,AfterViewInit{
 
     ngAfterViewInit(): void {
 
+
         this.styleNumber = this.styleSheet.cssRules.length
         
         this.colors.forEach((val,key)=>{

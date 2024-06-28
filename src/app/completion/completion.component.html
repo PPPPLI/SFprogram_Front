@@ -1,8 +1,14 @@
-@for (item of stationMatch; track $index) {
-    
-    <div class="searchBox"  (click)="select($index)">
-        <img [src]="iconMap.get(stationNames[$index])" alt="linePic" height="25px">
-        <div class='res'>{{item | slice:8}}</div>
+@for (item of stations; track $index) {
+    <div class="searchBox"  (click)="select($index)" [class]="unreachable.includes(item.substring(8))+'searchBox'">
+        <div class='res' [class]="unreachable.includes(item.substring(8))+'searchBox'">{{item | slice:8}}</div>
+        <div class="imgBox">
+            @if(unreachable.includes(item.substring(8))){
+                <h4 style="color: red;" class="unreachable">Station Fermée</h4>
+                <img  src="../../assets/img/unreachable.png" alt="linePic" height="25px" class="unreachable">
+            }@else {
+                <img *ngFor="let ele of line[$index]" [src]="iconMap.get(ele)" alt="linePic" height="25px">
+            }
+        </div>
     </div>
 
     

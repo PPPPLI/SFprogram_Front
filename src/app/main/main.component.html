@@ -5,24 +5,23 @@
                 <div id="formDiv">
                     <div id="localisationDiv">
                         <div id="inputDiv">
-                            <input type="text" placeholder="De:" formControlName="start" class="stationSearch" (keydown)="clearList(1)">
-                            <input type="text" placeholder="À:" formControlName="destination"  class="inputTrajet stationSearch" (keydown)="clearList(2)">
+                            <input type="text" placeholder="De:" id="startStation" formControlName="start" class="stationSearch" (keydown)="clearList(1)">
+                            <input type="text" placeholder="À:" id="arrivalStation" formControlName="destination"  class="inputTrajet stationSearch" (keydown)="clearList(2)">
                         </div>
                         <div id="switchDiv">
                             <img src="../../assets/img/Capture.PNG" alt="switchIcon" (click)="reverse()">
                         </div>
                     </div>
                     <div id="timeDiv">
-                        <select formControlName="day"  class="inputTrajet" id="day" (change)="validate()">
+                        <select formControlName="day"  class="inputTrajet" id="day" (change)="validateAccessibility()">
                             @for (ele of semaine; track $index) {
                                 <option [value]="$index">{{ele}}</option>
                             }
-                            
                         </select>
                 
                         <select formControlName="reverse" class="inputTrajet" id="reverse" (change)="validate()">
                             <option value="0">Partir à</option>
-                            <option value="1">Arriver à</option>
+                            <option value="1">Arriver avant</option>
                         </select>
 
                         <input type="time" formControlName="start_time"  class="inputTrajet timeChoice" id="time" (change)="validate()">
@@ -34,11 +33,11 @@
 
                         <div id="proposition">
                             <app-completion [start]="formData.value.start" [destination]="formData.value.destination" (stationChoice)="completer($event)"
-                                            (validation)="validate($event)"></app-completion>
+                                            (validation)="validate($event)" [unreachable]="unreachable"></app-completion>
                         </div>
-                    }@else {
+                    }@else if(buffer.length !== 0){
 
-                        <trajetComponet [trajet]="trajetStations" [carbon]="carbon" [totalTime]="totalTime" (stationChoice)="displayStation($event)"></trajetComponet>
+                        <trajetComponet [trajet]="trajetStations" [carbon]="carbon" [totalTime]="totalTime"  (stationChoice)="displayStation($event)"></trajetComponet>
                     }
                     
                 </div>

@@ -1,7 +1,7 @@
-import { Component, OnDestroy, OnInit} from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, Renderer2} from '@angular/core';
 import * as L from 'leaflet';
 import { LinesService } from '../service/lines.service';
-import { Subscription } from 'rxjs';
+import { Subscription} from 'rxjs';
 import { FormBuilder,FormsModule,ReactiveFormsModule, Validators,} from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Station, Trajet } from '../model/models';
@@ -21,10 +21,12 @@ import { MarkerPutService } from '../service/marker-put.service';
 export class MainComponent implements OnInit,OnDestroy{
 
     constructor(private lines:LinesService, private formBuilder: FormBuilder, private getRequest: HttpRequestService,
-        private timecaculator:timeCalculatorService, private markerputService:MarkerPutService
+        private timecaculator:timeCalculatorService, private markerputService:MarkerPutService,private render2:Renderer2,
+        private elementRef:ElementRef
     ){}
 
     semaine = ["Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi","Dimanche"]
+    unreachable:string[]=[]
     globalData:any
     carbon: number = 0
     lineMarker:String = "init"
@@ -41,8 +43,7 @@ export class MainComponent implements OnInit,OnDestroy{
             name:"",
             latitude:0,
             longitude:0
-        }
-    }
+        }}
     initialZoomLevel?:number
     totalTime = 0
     validationDepart = false
@@ -52,6 +53,7 @@ export class MainComponent implements OnInit,OnDestroy{
     stationNames?:Array<String>
     metroLines = [[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]]
     trajetStations:Station[] = []
+    buffer:Station[] = []
     count = 0
     lineFeature:L.FeatureGroup = L.featureGroup()
     circlesFeature:L.FeatureGroup = L.featureGroup()
@@ -60,7 +62,7 @@ export class MainComponent implements OnInit,OnDestroy{
     subscrib:Subscription = new Subscription();
     subscribColor:Subscription = new Subscription()
     stylesheet = document.styleSheets[0] as CSSStyleSheet
-    styleIndex!:number
+    styleIndex:number = 0
     data:Trajet = {
         start: "",
         destination:"",
@@ -89,15 +91,62 @@ export class MainComponent implements OnInit,OnDestroy{
         }
     }
 
+    validateAccessibility(){
+
+        this.clearList()
+        
+        let formInfo = this.formData.value;
+        this.data.start = "Gambetta"
+        this.data.destination = "Pelleport"
+        this.data.time = formInfo.start_time!
+        this.data.day = Number.parseInt(formInfo.day!)
+        this.data.reverse = formInfo.reverse == 0? false:true
+
+        this.getRequest.getTrajet("/find",this.data).subscribe(res=>{
+
+            this.unreachable = res.unreachable
+
+            if(this.unreachable.includes(formInfo.start!)){
+
+                
+                this.validationDepart = false
+
+                this.formData.patchValue({
+
+                    start:formInfo.start + "(Fermée)",
+                })
+                this.render2.setStyle(this.elementRef.nativeElement.querySelector("#startStation"),"color","red")
+            }
+
+            if(this.unreachable.includes(formInfo.destination!)){
+
+                console.log(222)
+                
+                this.validationArrival = false
+
+                this.formData.patchValue({
+
+                    start:formInfo.start,
+                    destination:formInfo.destination+ "(Fermée)"
+                })
+
+                this.render2.setStyle(this.elementRef.nativeElement.querySelector("#arrivalStation"),"color","red")
+            }
+
+            this.validate()
+        })
+
+    }
+
     validate(data?:any){
+
 
         if(typeof data == "boolean"){
 
             data?this.validationArrival = true:this.validationDepart = true
         }
-        
-        if(this.validationArrival && this.validationDepart){
 
+        if(this.validationArrival && this.validationDepart){
             this.print()
         }
     }
@@ -106,17 +155,34 @@ export class MainComponent implements OnInit,OnDestroy{
         
         let formInfo = this.formData.value;
         this.isFirstStation = true
-        this.stylesheet.deleteRule(this.styleIndex)
+
+        if(this.elementRef.nativeElement.querySelector("#startStation").style.color == "red"  ||
+           this.elementRef.nativeElement.querySelector("#arrivalStation").style.color == "red"
+        ){
+
+            let color = this.elementRef.nativeElement.querySelector("#startStation").style.color
+            this.render2.setStyle(this.elementRef.nativeElement.querySelector("#startStation"),"color",this.elementRef.nativeElement.querySelector("#arrivalStation").style.color)
+            this.render2.setStyle(this.elementRef.nativeElement.querySelector("#arrivalStation"),"color",color)
+
+        }
+
+        if(this.styleIndex != 0){
+
+            this.stylesheet.deleteRule(this.styleIndex)
+            this.styleIndex = 0
+        }
+        
 
         if(formInfo.start != "" || formInfo.destination != ""){
             
-            let temp = formInfo.start
+            let temp_station = formInfo.start
             formInfo.start = formInfo.destination
-            formInfo.destination = temp
-
+            formInfo.destination = temp_station
+            let temp_validation = this.validationArrival
+            this.validationArrival = this.validationDepart
+            this.validationDepart = temp_validation
 
             this.formData.patchValue({
-
                 start:formInfo.start,
                 destination:formInfo.destination
             })
@@ -130,7 +196,7 @@ export class MainComponent implements OnInit,OnDestroy{
 
     print(){
 
-            let buffer:Station[] = []
+            this.buffer = []
 
             let formInfo = this.formData.value;
             this.data.start = formInfo.start!
@@ -139,36 +205,51 @@ export class MainComponent implements OnInit,OnDestroy{
             this.data.day = Number.parseInt(formInfo.day!)
             this.data.reverse = formInfo.reverse == 0? false:true
 
-            this.getRequest.getTrajet("/find",this.data).subscribe(res=>{
+            this.getRequest.getTrajet("/find",this.data)
 
-                this.carbon = Number.parseFloat(res.carbone)
+            .subscribe(res=>{
+                
+                if(res === null){
 
-                res.path.forEach(ele=>{
+                    this.formData.patchValue({
 
-                    let stationInfos:string[] = this.globalData[ele.line].split("}")
-                    stationInfos.forEach(station=>{
-
-                        if(station.includes(ele.name)){
-
-                            ele.latitude = Number.parseFloat(station.substring(station.indexOf("latitude")+11,station.length-1))
-                            ele.longitude = Number.parseFloat(station.substring(station.indexOf("longitude")+12,station.indexOf("latitude")-3))
-                            buffer.push(ele)
-                        }
-                        
+                        start:"",
+                        destination:formInfo.destination
                     })
-                })
 
-                this.trajetStations = buffer
-                this.totalTime = this.timecaculator.calculator(this.trajetStations[0].time,this.trajetStations[this.trajetStations.length-1].time)
+                    this.trajetStations.length == 0? this.validationDepart = false:this.clearList(1)
 
+                }else{
+                    this.carbon = Number.parseFloat(res.carbone)
 
-                this.styleIndex = this.stylesheet.cssRules.length
-
-                this.showtrajet(this.trajetStations,true)
-                this.markerputService.putFlagToCulture(buffer,this.circlesFeature)
-                let tooltip = this.markerputService.putTimeMarker(this.trajetStations,this.totalTime)
-                this.circlesFeature.addLayer(tooltip)
+                    res.path.forEach((ele:Station)=>{
+    
+                        let stationInfos:string[] = this.globalData[ele.line].split("}")
+                        stationInfos.forEach(station=>{
+    
+                            if(station.includes(ele.name)){
+    
+                                ele.latitude = Number.parseFloat(station.substring(station.indexOf("latitude")+11,station.length-1))
+                                ele.longitude = Number.parseFloat(station.substring(station.indexOf("longitude")+12,station.indexOf("latitude")-3))
+                                this.buffer.push(ele)
+                            }
+                            
+                        })
+                    })
+    
+                    this.trajetStations = this.buffer
+                    this.totalTime = this.timecaculator.calculator(this.trajetStations[0].time,this.trajetStations[this.trajetStations.length-1].time)
+    
+    
+                    this.styleIndex = this.stylesheet.cssRules.length
+    
+                    this.showtrajet(this.trajetStations,true)
+                    this.markerputService.putFlagToCulture(this.buffer,this.circlesFeature)
+                    let tooltip = this.markerputService.putTimeMarker(this.trajetStations,this.totalTime)
+                    this.circlesFeature.addLayer(tooltip)
+                }
             })
+            
     }
 
 
@@ -298,11 +379,24 @@ export class MainComponent implements OnInit,OnDestroy{
         }
     }
 
-    clearList(data:number){
+    clearList(data?:number){
+
+        
+
+        if(data == 1 && this.elementRef.nativeElement.querySelector("#startStation").style.color == "red") this.render2.removeStyle(this.elementRef.nativeElement.querySelector("#startStation"),"color")
+
+        if(data == 2 && this.elementRef.nativeElement.querySelector("#arrivalStation").style.color == "red") this.render2.removeStyle(this.elementRef.nativeElement.querySelector("#arrivalStation"),"color")
 
         if(this.trajetStations.length != 0){
 
-            data == 1? this.validationDepart = false:this.validationArrival = false
+            if(data == 1){
+
+                this.validationDepart = false
+            }else if(data == 2){
+
+                this.validationArrival = false
+            }
+            
             this.trajetStations = []
             this.map?.removeLayer(this.circlesFeature)
             this.map?.removeLayer(this.segmentsFeature)
@@ -311,9 +405,12 @@ export class MainComponent implements OnInit,OnDestroy{
             this.trajet = []
             this.lineMarker = "init"
             this.isFirstStation = true
-            this.stylesheet.deleteRule(this.styleIndex)
+            if(this.styleIndex != 0){
+                
+                this.stylesheet.deleteRule(this.styleIndex)   
+                this.styleIndex = 0
+            }
         }
-
     }
 
     displayStation(data:number){
@@ -395,6 +492,18 @@ export class MainComponent implements OnInit,OnDestroy{
         this.subscribColor = this.lines.colorMap$.subscribe(data =>{
 
             this.colors = data
+        })
+
+        let formInfo = this.formData.value;
+        this.data.start = "Gambetta"
+        this.data.destination = "Pelleport"
+        this.data.time = formInfo.start_time!
+        this.data.day = Number.parseInt(formInfo.day!)
+        this.data.reverse = formInfo.reverse == 0? false:true
+
+        this.getRequest.getTrajet("/find",this.data).subscribe(res=>{
+
+            this.unreachable = res.unreachable
         })
     }
 

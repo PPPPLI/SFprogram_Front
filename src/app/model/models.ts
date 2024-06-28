@@ -12,7 +12,8 @@ export type Res = {
 
     path : Station[],
     carbone:string,
-    connexe:boolean
+    connexe:boolean,
+    unreachable:string[]
 }
 
 
@@ -29,5 +30,4 @@ export type Station = {
         name:string,
         latitude:number,
         longitude:number
-    }
-}
+    }}

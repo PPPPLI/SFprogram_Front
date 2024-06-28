@@ -36,7 +36,7 @@ export class LinesService{
         ["LINE_1","#ffbe00"],
         ["LINE_2","#0055c8"],
         ["LINE_3","#6e6e00"],
-        ["LINE_3B","82c8e6"],
+        ["LINE_3B","#82c8e6"],
         ["LINE_4","#a0006e"],
         ["LINE_5","#ff5a00"],
         ["LINE_6","#82dc73"],

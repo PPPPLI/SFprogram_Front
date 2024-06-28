@@ -1,11 +1,9 @@
 div{
 
     cursor: pointer;
-    margin: 15px 0;
-    font-weight: 400;
+    font-weight: 600;
+    padding: 8px 0;
     font-size: medium;
-    padding-left: 10%;
-    
 }
 
 
@@ -13,18 +11,44 @@ div{
 
     display: flex;
     flex-direction: row;
-    justify-content: start;
+    justify-content: space-between;
     align-items: center;
-    color: rgb(155, 151, 151);
+    color: rgb(19, 29, 117);
 }
 
 .searchBox:hover{
 
     background-color: rgb(249, 247, 247);
-    color: black;
 }
 
 .res{
 
     text-align: left;
+    padding-left: 10%;
+    padding-right: 5%;
+}
+
+.imgBox{
+
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-right: 10%;
+}
+
+img{
+
+    margin: 5px 3px;
+}
+
+.truesearchBox,.unreachable{
+
+    cursor: not-allowed !important;
+}
+
+h4{
+
+    margin-right: 5px;
 }

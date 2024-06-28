@@ -119,8 +119,6 @@ export class MainComponent implements OnInit,OnDestroy{
             }
 
             if(this.unreachable.includes(formInfo.destination!)){
-
-                console.log(222)
                 
                 this.validationArrival = false
 

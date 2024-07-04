@@ -138,11 +138,18 @@ form{
     padding-left: 10px;
 }
 
-img{
+#resverseImg{
 
     cursor: pointer;
     width: 25px;
+}
 
+#logo{
+    padding: 5px;
+    position:fixed;
+    background-color: white;
+    right: 0;
+    bottom: 0;
 }
 
 #proposition{

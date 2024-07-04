@@ -2,7 +2,7 @@ import { Component, ElementRef, OnDestroy, OnInit, Renderer2} from '@angular/cor
 import * as L from 'leaflet';
 import { LinesService } from '../service/lines.service';
 import { Subscription} from 'rxjs';
-import { FormBuilder,FormsModule,ReactiveFormsModule, Validators,} from '@angular/forms';
+import { FormBuilder,FormGroup,FormsModule,ReactiveFormsModule, Validators,} from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Station, Trajet } from '../model/models';
 import { HttpRequestService } from '../service/http-request.service';

@@ -1,5 +1,6 @@
 <div id="main">
     <div id="searchDiv">
+        <img src="../../assets/img/logo.png" alt="logo" width="100px" id="logo">
         <form [formGroup]="formData">
             <div id="container">
                 <div id="formDiv">
@@ -9,7 +10,7 @@
                             <input type="text" placeholder="À:" id="arrivalStation" formControlName="destination"  class="inputTrajet stationSearch" (keydown)="clearList(2)">
                         </div>
                         <div id="switchDiv">
-                            <img src="../../assets/img/Capture.PNG" alt="switchIcon" (click)="reverse()">
+                            <img id="resverseImg" src="../../assets/img/Capture.PNG" alt="switchIcon" (click)="reverse()">
                         </div>
                     </div>
                     <div id="timeDiv">
@@ -18,7 +19,7 @@
                                 <option [value]="$index">{{ele}}</option>
                             }
                         </select>
-                
+                        
                         <select formControlName="reverse" class="inputTrajet" id="reverse" (change)="validate()">
                             <option value="0">Partir à</option>
                             <option value="1">Arriver avant</option>
